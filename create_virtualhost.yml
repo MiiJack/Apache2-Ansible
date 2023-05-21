@@ -1,0 +1,23 @@
+---
+- name: Create Root directory
+  file:
+    path: "/var/www/{{ domain_name.split('.')[1] }}/{{ domain_name.split('.')[0] }}"
+    state: directory
+    owner: www-data
+    mode: '0755'
+
+- name: Create virtual host configuration file
+  template:
+    src: virtualhost_template.j2
+    dest: "/etc/apache2/sites-available/{{ domain_name }}.conf"
+    
+- name: Create symbolic link for virtual host configuration file
+  command: "ln -s /etc/apache2/sites-available/{{ domain_name }}.conf /etc/apache2/sites-enabled/{{ domain_name }}.conf"
+  
+- name: Enable virtual host
+  apache2_site:
+    name: "{{ domain_name }}"
+    state: enabled
+  notify:
+    - restart apache2
+#untested
