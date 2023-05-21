@@ -1,0 +1,32 @@
+---
+- name: Setup Virtual Hosts
+  hosts: all
+  become: true
+  vars:
+    domain_names_file: "{{ domain_names_file_path }}"
+  tasks:
+    - name: Install Apache2
+      apt:
+        name: "apache2"
+        update_cache: yes
+        state: latest
+    - name: Enable mod_rewrite
+      apache2_module:
+        name: rewrite
+        state: present
+      notify:
+        - restart apache2
+    - name: Read domain names from file
+      set_fact:
+        domain_names: "{{ lookup('lines', domain_names_file) }}"
+    - name: Create virtual hosts
+      include_tasks: create_virtualhost.yml
+      loop: "{{ domain_names }}"
+      loop_control:
+        loop_var: domain_name
+  handlers:
+    - name: restart apache2
+      service:
+        name: apache2
+        state: restarted
+#untested
