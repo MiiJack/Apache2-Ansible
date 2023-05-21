@@ -1,0 +1,5 @@
+<VirtualHost *:80>
+  ServerName {{ domain_name }}
+  ServerAlias {{ domain_name.split('.')[0] }}.{{ domain_name.split('.')[1] }}
+  DocumentRoot "/var/www/{{ domain_name.split('.')[1] }}/{{ domain_name.split('.')[0] }}"
+</VirtualHost>
